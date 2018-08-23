@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+message ParseRequest {
+    string replayUrl = 1;
+    uint64 playerId = 2;
+    uint64 matchId = 3;
+    uint64 replaySalt = 4;
+}
+
+message ParseResult {
+    ReplayData replayData = 1;
+    bool Success = 2;
+    string ErrorInfo = 3;
+}
+
+service ParseService {
+    rpc Parse(ParseRequest) returns (ParseResult) {}
+}
+
+message ReplayData {
+    uint64 gameTotalTimeSec = 1;
+    repeated MovesMap movesMap = 2;
+}
+
+message MovesMap {
+    string heroName = 1;
+    repeated Move moves = 2;
+}
+
+message Move {
+    uint64 time = 1;
+    uint64 x = 2;
+    uint64 y = 3;
+}
