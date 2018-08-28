@@ -17,7 +17,7 @@ func main() {
 		log.Fatal(err)
 	}
 	dir := help.GetCurrentDir()
-	creds, err := credentials.NewServerTLSFromFile(dir+"/cert/cert.pem", dir+"/cert/cert.key")
+	creds, err := credentials.NewServerTLSFromFile(dir+"/cert/server.crt", dir+"/cert/server.key")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -13,7 +13,8 @@ if [ -z "$1" ]
 fi
 
 echo "Building binary..."
-go build -o ${NAME}
+go build -o ${GOPATH}/src/github.com/lempiy/dora/services/parser/${NAME} \
+    github.com/lempiy/dora/services/parser
 if [ $? -eq 0 ]; then
     echo "Build for ${NAME} is done!"
 else
@@ -21,7 +22,8 @@ else
 fi
 
 echo "Start building image of ${NAME}..."
-docker build -t lempiy/${NAME}:$1
+cp -r cert services/parser
+docker build -t lempiy/${NAME}:$1 ${GOPATH}/src/github.com/lempiy/dora/services/parser
 if [ $? -eq 0 ]; then
     echo "Successfully built ${NAME}!"
 else
@@ -38,6 +40,7 @@ fi
 
 # sed -i -e "s/${NAME}:v.*/${NAME}:${1}/g" ./docker/docker-compose-build.yml
 echo "Remove temporal files ..."
-rm ${NAME}
+rm services/parser/${NAME}
+rm -rf services/parser/cert
 
 echo "Build $1 | Local Time: $(date)"
