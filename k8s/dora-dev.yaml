@@ -26,6 +26,7 @@ kind: Service
 metadata:
   name: dora-parser-service
 spec:
+  type: NodePort
   selector:
     app: dora
   ports:
