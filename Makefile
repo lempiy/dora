@@ -3,7 +3,7 @@
 # @author Lempiy Anton <lempiyada@gmail.com>
 #
 
-GOVERSION = 1.11beta2
+GOVERSION = 1.11
 
 # Parser def
 PARSER_NAME = dora_parser
