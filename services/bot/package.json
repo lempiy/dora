@@ -1,0 +1,21 @@
+{
+  "name": "dora-bot",
+  "version": "0.0.1",
+  "description": "Node dota 2 bot service for Dora application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "deferred": "^0.7.9",
+    "dota2-bot": "^1.1.2",
+    "long": "^4.0.0",
+    "merge": "^1.2.0",
+    "moment": "^2.22.1",
+    "protobufjs": "^6.8.6",
+    "steam": "^1.4.0",
+    "winston": "^2.4.2"
+  },
+  "author": "",
+  "license": "ISC"
+}
