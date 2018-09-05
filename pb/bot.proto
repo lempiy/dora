@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+option go_package = "shared/pb/bot";
+
+// begin Player Card
+
+message PlayerCardRequest {
+    uint64 player_id = 1;
+}
+
+message PlayerCardResult {
+    uint64 account_id = 1;
+    uint64 background_def_index = 2;
+    repeated PlayerSlot slots = 3;
+    uint64 badge_points = 4;
+}
+
+message PlayerSlot {
+    uint64 slot_id = 1;
+    oneof stats {
+        PlayerStat stat = 2;
+        PlayerHero hero = 3;
+        PlayerItem item = 4;
+    }
+}
+
+message PlayerStat {
+    string stat_id = 1;
+    uint64 stat_score = 2;
+}
+
+message PlayerHero {
+    uint64 hero_id = 1;
+    uint64 hero_wins = 2;
+}
+
+message PlayerItem {
+    string serialized_item = 1;
+    string item_id = 2;
+}
+
+// end Player Card
+
+// begin Matches History
+
+message MatchesHistoryRequest {
+    uint64 player_id = 1;
+}
+
+message MatchesHistoryResult {
+    repeated Match matches = 1;
+}
+
+message Match {
+    string match_id = 1;
+    uint64 start_time = 2;
+    uint64 hero_id = 3;
+    bool winner = 4;
+    uint64 game_mode = 5;
+    uint64 lobby_type = 6;
+    uint64 duration = 7;
+    uint64 engine = 8;
+    bool active_battle_pass = 9;
+}
+
+// end Matches History
+
+// begin Match Details
+
+message MatchDetailsRequest {
+    uint64 match_id = 1;
+}
+
+message MatchDetailsResult {
+    uint64 result = 1;
+    MatchDetails match = 2;
+    string vote = 3;
+}
+
+message MatchDetails {
+    uint64 duration = 1;
+    uint64 startTime = 2;
+    repeated MatchPlayers players = 3;
+    string match_id = 4;
+    repeated uint64 tower_status = 5;
+    repeated uint64 barracks_status = 6;
+    uint64 cluster = 7;
+    uint64 first_blood_time = 8;
+    uint64 replay_salt = 9;
+    uint64 lobby_type = 10;
+    uint64 human_players = 11;
+    uint64 leagueid = 12;
+    uint64 positive_votes = 13;
+    uint64 negative_votes = 14;
+    uint64 game_mode = 15;
+    repeated MatchPickBans picks_bans = 16;
+    string replay_state = 17;
+    uint64 series_id  = 18;
+    uint64 series_type  = 19;
+    uint64 engine  = 20;
+    uint64 match_flags  = 21;
+    uint64 radiant_team_score  = 22;
+    uint64 dire_team_score  = 23;
+    string match_outcome  = 24;
+    uint64 pre_game_duration  = 25;
+}
+
+message MatchPlayers {
+    uint64 account_id = 1;
+    uint64 player_slot = 2;
+    uint64 hero_id = 3;
+    uint64 item_0 = 4;
+    uint64 item_1 = 5;
+    uint64 item_2 = 6;
+    uint64 item_3 = 7;
+    uint64 item_4 = 8;
+    uint64 item_5 = 9;
+    uint64 kills = 10;
+    uint64 deaths = 11;
+    uint64 assits = 12;
+    uint64 leaver_status = 13;
+    uint64 gold = 14;
+    uint64 last_hits = 15;
+    uint64 denies = 16;
+    uint64 gold_per_min = 17;
+    uint64 XP_per_min = 18;
+    uint64 gold_spent = 19;
+    uint64 hero_damage = 20;
+    uint64 tower_damage = 21;
+    uint64 hero_healing = 22;
+    uint64 level = 23;
+    string player_name = 24;
+    string party_id = 25;
+    bool active_battle_pass = 26;
+    uint64 net_worth = 27;
+    uint64 scaled_hero_damage = 28;
+    uint64 scaled_tower_damage = 29;
+    uint64 scaled_hero_healing = 30;
+    uint64 item_6 = 31;
+    uint64 item_7 = 32;
+    uint64 item_8 = 33;
+}
+
+message MatchPickBans {
+    bool is_pick = 1;
+    int64 team = 2;
+    int64 hero_id = 3;
+}
+
+// end Match Details
+
+service BotService {
+    rpc GetPlayerCard(PlayerCardRequest) returns (PlayerCardResult) {}
+    rpc GetMatchesHistory(MatchesHistoryRequest) returns (MatchesHistoryResult) {}
+    rpc GetMatchDetails(MatchDetailsRequest) returns (MatchDetailsResult) {}
+}

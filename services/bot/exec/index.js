@@ -47,13 +47,13 @@ module.exports = {
         bot.connect()
         connected = true
     },
-    getProfileData(profileID) {
+    async getProfileData(profileID) {
         return new Promise((resolve, reject) => {
             _requestQueue.set(`profileCardData_${profileID}`, resolve)
             bot.schedule(() => bot.Dota2.requestProfileCard(profileID))
         })
     },
-    getPlayerMatchHistory(profileID, options) {
+    async getPlayerMatchHistory(profileID, options) {
         return new Promise((resolve, reject) => {
             const request_id = `${profileID}_${Math.floor(Math.random() * 10000)}`
             const defaultOptions = {
@@ -67,7 +67,7 @@ module.exports = {
             })
         })
     },
-    getMatchDetails(matchId) {
+    async getMatchDetails(matchId) {
         return new Promise((resolve, reject) => {
             _requestQueue.set(`matchDetailsData_${matchID}`, resolve)
             bot.schedule(() => {
