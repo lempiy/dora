@@ -1,3 +1,5 @@
+'use strict';
+
 const config = require("../config")
 const DotaBot = require("dota2-bot")
 

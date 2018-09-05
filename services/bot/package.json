@@ -9,6 +9,7 @@
   "dependencies": {
     "deferred": "^0.7.9",
     "dota2-bot": "^1.1.2",
+    "grpc": "^1.14.1",
     "long": "^4.0.0",
     "merge": "^1.2.0",
     "moment": "^2.22.1",
