@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+option go_package = "shared/pb/prs";
+
 message ParseRequest {
     string replayUrl = 1;
     uint64 playerId = 2;

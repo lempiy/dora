@@ -6,7 +6,6 @@ import (
 	"google.golang.org/grpc/credentials"
 	"log"
 	"net"
-	"net/http"
 )
 
 // TODO: move to env variables

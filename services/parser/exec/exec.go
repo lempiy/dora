@@ -2,15 +2,15 @@ package exec
 
 import (
 	"github.com/dotabuff/manta"
-	"github.com/lempiy/dora/shared"
+	"github.com/lempiy/dora/shared/pb/prs"
 	"io"
 	"strings"
 	"time"
 )
 
 // ParseReplay - parses replay from source stream, returns parsed data
-func ParseReplay(source io.Reader) (*shared.ReplayData, error) {
-	var result shared.ReplayData
+func ParseReplay(source io.Reader) (*prs.ReplayData, error) {
+	var result prs.ReplayData
 	p, err := manta.NewStreamParser(source)
 	if err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func ParseReplay(source io.Reader) (*shared.ReplayData, error) {
 		preGameTime   = time.Duration(0)
 		startGameTime = time.Duration(0)
 		gameEndTime   = time.Duration(0)
-		movement      = make(map[string]*[]*shared.Move)
+		movement      = make(map[string]*[]*prs.Move)
 		checks        = make(map[string]time.Duration)
 	)
 	p.OnEntity(func(entity *manta.Entity, op manta.EntityOp) error {
@@ -44,7 +44,7 @@ func ParseReplay(source io.Reader) (*shared.ReplayData, error) {
 				x, _ := entity.GetUint64("CBodyComponent.m_cellX")
 				y, _ := entity.GetUint64("CBodyComponent.m_cellY")
 				if arr, exist := movement[entity.GetClassName()]; !exist {
-					data := &[]*shared.Move{
+					data := &[]*prs.Move{
 						{
 							Time: uint64(gameTime - startGameTime),
 							X:    x,
@@ -53,7 +53,7 @@ func ParseReplay(source io.Reader) (*shared.ReplayData, error) {
 					}
 					movement[entity.GetClassName()] = data
 				} else {
-					*arr = append(*arr, &shared.Move{
+					*arr = append(*arr, &prs.Move{
 						Time: uint64(gameTime - startGameTime),
 						X:    x,
 						Y:    y,
@@ -67,7 +67,7 @@ func ParseReplay(source io.Reader) (*shared.ReplayData, error) {
 	result.GameTotalTimeSec = uint64(gameEndTime - startGameTime)
 	p.Start()
 	for key, value := range movement {
-		result.MovesMap = append(result.MovesMap, &shared.MovesMap{
+		result.MovesMap = append(result.MovesMap, &prs.MovesMap{
 			HeroName: key,
 			Moves:    *value,
 		})

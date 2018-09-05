@@ -37,10 +37,10 @@
   branch = "master"
   name = "github.com/lempiy/dora"
   packages = [
-    "shared",
-    "shared/help"
+    "shared/help",
+    "shared/pb/prs"
   ]
-  revision = "d39ce2fe5458a7cd05fbdd1bf47a59a37a3dff36"
+  revision = "f35cb0714460de3e7c59c906e90068ce39eda738"
 
 [[projects]]
   branch = "master"
@@ -135,6 +135,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a3c661101d044ae7f778026ed21847189831cf48d1946556196b530aabaa954e"
+  inputs-digest = "65302f32fab96fe4f212fc71a3ac0fb3b1d0d1b06942170bf70dd89c5ce2490a"
   solver-name = "gps-cdcl"
   solver-version = 1
