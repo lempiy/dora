@@ -1,3 +1,5 @@
+### PARSER ###
+
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -19,12 +21,51 @@ spec:
           image: dev-dora-dora_parser:latest
           imagePullPolicy: Never
           ports:
-          - containerPort: 7000
+          - name: dora-parser
+            containerPort: 7000
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: dora-parser-service
+spec:
+  selector:
+    app: dora
+  ports:
+  - name: http
+    protocol: TCP
+    port: 7000
+    targetPort: dora-parser
+
+### BOT ###
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: dora-bot-deployment
+  labels:
+    app: dora
+spec:
+  selector:
+    matchLabels:
+      app: dora
+  replicas: 1 #1 for test
+  template:
+    metadata:
+      labels:
+        app: dora
+    spec:
+      containers:
+        - name: dora-bot
+          image: dev-dora-dora_bot:latest
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 6000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dora-bot-service
 spec:
   type: NodePort
   selector:
@@ -32,6 +73,6 @@ spec:
   ports:
   - name: http
     protocol: TCP
-    port: 7000
-    targetPort: 7000
+    port: 6000
+    targetPort: 6000
 ---

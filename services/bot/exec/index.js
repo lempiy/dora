@@ -42,7 +42,7 @@ module.exports = {
     get isConnected() {
         return connected
     },
-    set isConnected() {
+    set isConnected(value) {
         throw new Error('cannot set isConnected directly')
     },
     connect() {

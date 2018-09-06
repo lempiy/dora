@@ -1,6 +1,6 @@
 'use strict'
 
-const PORT = 7000 // TODO: ENV var
+const PORT = 6000 // TODO: ENV var
 const PATH_TO_PROTO = './bot.proto' // TODO: Docker COPY + ENV var
 const PATH_TO_CERT = './cert/ca.crt'
 const PATH_TO_SERVER_CERT = './cert/server.crt' 
@@ -8,6 +8,7 @@ const PATH_TO_SERVER_KEY = './cert/server.key'
 
 const fs = require('fs')
 const grpc = require('grpc')
+const handlers = require('./handlers')
 const service = grpc.load(PATH_TO_PROTO)
 
 const cacert = fs.readFileSync(PATH_TO_CERT),
@@ -20,11 +21,7 @@ const cacert = fs.readFileSync(PATH_TO_CERT),
 const credentials = grpc.ServerCredentials.createSsl(cacert, [authority])
 const server = new grpc.Server()
 
-server.addProtoService(service.BotService.service, {
-    getPlayerCard: null,
-    getMatchesHistory: null,
-    getMatchDetails: null,
-})
+server.addProtoService(service.BotService.service, handlers)
 server.bind(`127.0.0.1:${PORT}`, credentials)
 console.log(`Starting server on port ${PORT}`)
 server.start()

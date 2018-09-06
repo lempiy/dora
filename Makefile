@@ -9,17 +9,24 @@ GOVERSION = 1.11
 PARSER_NAME = dora_parser
 PARSER_VER = v0.0.1
 
+# Bot def
+BOT_NAME = dora_bot
+BOT_VER = v0.0.1
+
 MINIKUBE_STOPPED = $(shell minikube status | grep -o Stopped)
 
 ifeq ($(SERVICE),parser)
 	name=$(PARSER_NAME)
+endif
+ifeq ($(SERVICE),bot)
+	name=$(BOT_NAME)
 endif
 
 .PHONY: target
 
 target:
 ifndef name
-	@echo 'Please provide SERVICE=name (posible variants: parser)'
+	@echo 'Please provide SERVICE=name (posible variants: parser,bot)'
 	@exit 1
 endif
 ifndef VERSION
@@ -34,8 +41,12 @@ endif
 
 dev:
 ifndef name
-	@echo 'Please provide SERVICE=name (posible variants: parser)'
+	@echo 'Please provide SERVICE=name (posible variants: parser,bot)'
 	@exit 1
+endif
+ifeq ($(MINIKUBE_STOPPED), Stopped)
+	@echo minikube is down. Running minikube ...
+	@minikube start
 endif
 	@eval $(minikube docker-env)
 	services/$(SERVICE)/dev.sh
@@ -46,7 +57,14 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@minikube service dora-parser-service --url
+	@minikube service dora-bot-service --url
+
+k8s-clear-dev:
+ifeq ($(MINIKUBE_STOPPED), Stopped)
+	@echo minikube is down. Running minikube ...
+	@minikube start
+endif
+	@kubectl delete -f k8s/dora-dev.yaml
 
 k8s-create-dev:
 ifeq ($(MINIKUBE_STOPPED), Stopped)
@@ -58,3 +76,6 @@ endif
 	
 k8s-show-pods:
 	@kubectl get pods
+
+k8s-dev-down:
+	@minikube stop
