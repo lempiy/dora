@@ -13,6 +13,10 @@ PARSER_VER = v0.0.1
 BOT_NAME = dora_bot
 BOT_VER = v0.0.1
 
+# API def
+API_NAME = dora_API
+API_VER = v0.0.1
+
 MINIKUBE_STOPPED = $(shell minikube status | grep -o Stopped)
 
 ifeq ($(SERVICE),parser)
@@ -21,12 +25,15 @@ endif
 ifeq ($(SERVICE),bot)
 	name=$(BOT_NAME)
 endif
+ifeq ($(SERVICE),api)
+	name=$(API_NAME)
+endif
 
 .PHONY: target
 
 target:
 ifndef name
-	@echo 'Please provide SERVICE=name (posible variants: parser,bot)'
+	@echo 'Please provide SERVICE=name (posible variants: parser, bot, api)'
 	@exit 1
 endif
 ifndef VERSION
@@ -41,14 +48,14 @@ endif
 
 dev:
 ifndef name
-	@echo 'Please provide SERVICE=name (posible variants: parser,bot)'
+	@echo 'Please provide SERVICE=name (posible variants: parser, bot, api)'
 	@exit 1
 endif
 ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@eval $(minikube docker-env)
+	@eval $(@minikube docker-env)
 	services/$(SERVICE)/dev.sh
 	@exit 0
 
@@ -57,7 +64,7 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@minikube service dora-bot-service --url
+	@minikube service dora-api-service --url
 
 k8s-clear-dev:
 ifeq ($(MINIKUBE_STOPPED), Stopped)
