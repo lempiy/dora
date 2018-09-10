@@ -33,7 +33,7 @@ endif
 
 target:
 ifndef name
-	@echo 'Please provide SERVICE=name (posible variants: parser, bot, api)'
+	@echo 'Please provide SERVICE=name (possible variants: parser, bot, api)'
 	@exit 1
 endif
 ifndef VERSION
@@ -55,7 +55,7 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@eval $(@minikube docker-env)
+	@eval $(shell minikube docker-env)
 	services/$(SERVICE)/dev.sh
 	@exit 0
 

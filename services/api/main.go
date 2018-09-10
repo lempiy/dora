@@ -1,13 +1,22 @@
 package main
 
-import "net/http"
+import (
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/lempiy/dora/services/api/handlers"
+	"github.com/lempiy/dora/services/api/clients"
+)
 
-const port = ":9000"
+const port = "9000"
 
 func main() {
-	http.HandleFunc("/", func(rec http.ResponseWriter, req *http.Request) {
-		rec.WriteHeader(http.StatusOK)
-		rec.Write([]byte("OK"))
-	})
-	http.ListenAndServe(port, nil)
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	r := e.Router()
+
+	botService := clients.NewBotClient()
+	handlers.Run(r, botService)
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
