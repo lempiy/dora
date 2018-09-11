@@ -22,6 +22,6 @@ const credentials = grpc.ServerCredentials.createSsl(cacert, [authority])
 const server = new grpc.Server()
 
 server.addProtoService(service.BotService.service, handlers)
-server.bind(`127.0.0.1:${PORT}`, credentials)
+server.bind(`0.0.0.0:${PORT}`, credentials)
 console.log(`Starting server on port ${PORT}`)
 server.start()

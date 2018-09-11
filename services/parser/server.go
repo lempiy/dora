@@ -4,8 +4,11 @@ import (
 	"github.com/lempiy/dora/shared/help"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/reflection"
+	"github.com/lempiy/dora/services/parser/service"
 	"log"
 	"net"
+	"github.com/lempiy/dora/shared/pb/prs"
 )
 
 // TODO: move to env variables
@@ -23,6 +26,8 @@ func main() {
 	}
 	opts := []grpc.ServerOption{grpc.Creds(creds)}
 	s := grpc.NewServer(opts...)
+	prs.RegisterParseServiceServer(s, &service.ParserService{})
+	reflection.Register(s)
 	log.Printf("Parser server is now listening on port %s", port)
 	err = s.Serve(listen)
 	if err != nil {

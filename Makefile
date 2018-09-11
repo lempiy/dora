@@ -17,7 +17,9 @@ BOT_VER = v0.0.1
 API_NAME = dora_API
 API_VER = v0.0.1
 
+MINIKUBE_EVAL = $(shell minikube docker-env)
 MINIKUBE_STOPPED = $(shell minikube status | grep -o Stopped)
+
 
 ifeq ($(SERVICE),parser)
 	name=$(PARSER_NAME)
@@ -55,7 +57,7 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@eval $(shell minikube docker-env)
+	@eval $(MINIKUBE_EVAL)
 	services/$(SERVICE)/dev.sh
 	@exit 0
 

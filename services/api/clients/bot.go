@@ -24,7 +24,8 @@ func NewBotClient()*BotClient {
 	if err != nil {
 		log.Fatal("Cannot read credentials from file: ", err)
 	}
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(creds)}
+	log.Printf("Dialing %s:%d...", domain, port)
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(creds), grpc.WithBlock()}
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%d", domain, port), opts...)
 	if err != nil {
 		log.Fatal("Cannot dial TCP dora-bot", err)
