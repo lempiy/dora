@@ -14,7 +14,7 @@ BOT_NAME = dora_bot
 BOT_VER = v0.0.1
 
 # API def
-API_NAME = dora_API
+API_NAME = dora_api
 API_VER = v0.0.1
 
 MINIKUBE_EVAL = $(shell minikube docker-env)
@@ -58,7 +58,22 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@minikube start
 endif
 	@eval $(MINIKUBE_EVAL)
+	@docker rmi -f dev-dora-$(name):latest || true
 	services/$(SERVICE)/dev.sh
+	@kubectl delete pod $(shell kubectl get pods | grep -o "^$(SERVICE)-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*")
+	@exit 0
+
+refresh:
+ifndef name
+	@echo 'Please provide SERVICE=name (posible variants: parser, bot, api)'
+	@exit 1
+endif
+ifeq ($(MINIKUBE_STOPPED), Stopped)
+	@echo minikube is down. Running minikube ...
+	@minikube start
+endif
+	@eval $(MINIKUBE_EVAL)
+	@kubectl delete pod $(shell kubectl get pods | grep -o "^$(SERVICE)-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*")
 	@exit 0
 
 k8s-show-url:
