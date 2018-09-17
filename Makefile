@@ -66,7 +66,7 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@minikube service dora-api-service --url
+	@minikube service dora-api --url
 
 k8s-clear-dev:
 ifeq ($(MINIKUBE_STOPPED), Stopped)
@@ -80,7 +80,7 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@eval $(minikube docker-env)
+	@eval $(MINIKUBE_EVAL)
 	@kubectl create -f k8s/dora-dev.yaml
 	
 k8s-show-pods:

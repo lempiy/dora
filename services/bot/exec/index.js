@@ -7,8 +7,9 @@ const loginDetails = {
     account_name: config.steam_name,
     password: config.steam_pass
 }
+
 const bot = new DotaBot(loginDetails, true, false)
-const connected = false
+let connected = false
 const _requestQueue = new Map()
 
 // Watch common events
@@ -20,12 +21,13 @@ bot.Dota2.on('profileCardData', function (accId, data) {
     resolve(accId, data)
     _requestQueue.delete(`profileCardData_${accId}`)
 })
-bot.Dota2.on('playerMatchHistoryData', function (requestId, matchHistoryResponse) {
+bot.Dota2.on('playerMatchHistoryData', function (err, matchHistoryResponse) {
+    const requestId = matchHistoryResponse.request_id
     const resolve = _requestQueue.get(`playerMatchHistoryData_${requestId}`)
     if (!resolve) {
         throw new Error(`unexpected event with ID 'playerMatchHistoryData_${requestId}'`)
     }
-    resolve(requestId, matchHistoryResponse)
+    resolve(matchHistoryResponse.matches || [])
     _requestQueue.delete(`playerMatchHistoryData_${requestId}`)
 })
 bot.Dota2.on('matchDetailsData', function(matchID, matchDetailsData) {
@@ -52,20 +54,19 @@ module.exports = {
     async getProfileData(profileID) {
         return new Promise((resolve, reject) => {
             _requestQueue.set(`profileCardData_${profileID}`, resolve)
-            bot.schedule(() => bot.Dota2.requestProfileCard(profileID))
+            bot.schedule(() => bot.Dota2.requestProfileCard(+profileID))
         })
     },
     async getPlayerMatchHistory(profileID, options) {
         return new Promise((resolve, reject) => {
-            const request_id = `${profileID}_${Math.floor(Math.random() * 10000)}`
+            const request_id = Math.floor(Math.random() * 1e7)
             const defaultOptions = {
                 request_id,
                 matches_requested: 10
             }
             _requestQueue.set(`playerMatchHistoryData_${request_id}`, resolve)
             bot.schedule(() => {
-                _requestQueue.set(`playerMatchHistoryData_${request_id}`, resolve)
-                bot.Dota2.requestPlayerMatchHistory(profileID, {...defaultOptions, ...options})
+                bot.Dota2.requestPlayerMatchHistory(+profileID, {...defaultOptions, ...options})
             })
         })
     },
@@ -73,7 +74,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             _requestQueue.set(`matchDetailsData_${matchID}`, resolve)
             bot.schedule(() => {
-                bot.Dota2.requestMatchDetails(matchId)
+                bot.Dota2.requestMatchDetails(+matchId)
             })
         })
     }

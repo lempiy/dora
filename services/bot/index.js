@@ -18,7 +18,7 @@ const cacert = fs.readFileSync(PATH_TO_CERT),
         private_key: key,
         cert_chain: cert,
     }
-const credentials = grpc.ServerCredentials.createSsl(cacert, [authority])
+const credentials = grpc.ServerCredentials.createSsl(null, [authority])
 const server = new grpc.Server()
 
 server.addProtoService(service.BotService.service, handlers)
