@@ -57,8 +57,8 @@ ifeq ($(MINIKUBE_STOPPED), Stopped)
 	@echo minikube is down. Running minikube ...
 	@minikube start
 endif
-	@eval $(MINIKUBE_EVAL)
-	@docker rmi -f dev-dora-$(name):latest || true
+	@eval $(MINIKUBE_EVAL); \
+	docker rmi -f dev-dora-$(name):latest || true; \
 	services/$(SERVICE)/dev.sh
 	@kubectl delete pod $(shell kubectl get pods | grep -o "^$(SERVICE)-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*")
 	@exit 0

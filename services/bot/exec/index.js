@@ -21,15 +21,6 @@ bot.Dota2.on('profileCardData', function (accId, data) {
     resolve(accId, data)
     _requestQueue.delete(`profileCardData_${accId}`)
 })
-bot.Dota2.on('playerMatchHistoryData', function (err, matchHistoryResponse) {
-    const requestId = matchHistoryResponse.request_id
-    const resolve = _requestQueue.get(`playerMatchHistoryData_${requestId}`)
-    if (!resolve) {
-        throw new Error(`unexpected event with ID 'playerMatchHistoryData_${requestId}'`)
-    }
-    resolve(matchHistoryResponse.matches || [])
-    _requestQueue.delete(`playerMatchHistoryData_${requestId}`)
-})
 bot.Dota2.on('matchDetailsData', function(matchID, matchDetailsData) {
     const resolve = _requestQueue.get(`matchDetailsData_${matchID}`)
     if (!resolve) {
@@ -59,14 +50,18 @@ module.exports = {
     },
     async getPlayerMatchHistory(profileID, options) {
         return new Promise((resolve, reject) => {
-            const request_id = Math.floor(Math.random() * 1e7)
             const defaultOptions = {
-                request_id,
                 matches_requested: 10
             }
-            _requestQueue.set(`playerMatchHistoryData_${request_id}`, resolve)
             bot.schedule(() => {
-                bot.Dota2.requestPlayerMatchHistory(+profileID, {...defaultOptions, ...options})
+                bot.Dota2.requestPlayerMatchHistory(+profileID, {...defaultOptions, ...options}, (err, matchHistoryResponse) => {
+                    console.log(JSON.stringify(matchHistoryResponse, null, '  '))
+                    if (err) {
+                        reject(err)
+                        return
+                    }
+                    resolve(matchHistoryResponse.matches || [])
+                })
             })
         })
     },
