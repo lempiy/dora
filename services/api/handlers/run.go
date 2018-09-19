@@ -9,4 +9,6 @@ import (
 
 func Run(r *echo.Router, botService bot.BotServiceClient) {
 	r.Add(http.MethodPost, "/history", player.GetMatchesHistory(botService))
+	r.Add(http.MethodPost, "/card", player.GetPlayerCard(botService))
+	r.Add(http.MethodPost, "/match", player.GetMatchDetails(botService))
 }

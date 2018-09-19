@@ -49,7 +49,7 @@ module.exports = {
         const matchID = call.request.match_id
         if (!bot.isConnected) bot.connect()
         const match = await bot.getMatchDetails(matchID)
-        if (!card) {
+        if (!match) {
             callback('cannot get match details')
         }
         callback(null, match)

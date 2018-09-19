@@ -25,7 +25,7 @@ message PlayerSlot {
 }
 
 message PlayerStat {
-    string stat_id = 1;
+    uint64 stat_id = 1;
     uint64 stat_score = 2;
 }
 
@@ -35,8 +35,8 @@ message PlayerHero {
 }
 
 message PlayerItem {
-    string serialized_item = 1;
-    string item_id = 2;
+    bytes serialized_item = 1;
+    uint64 item_id = 2;
 }
 
 // end Player Card
@@ -74,71 +74,163 @@ message MatchDetailsRequest {
 message MatchDetailsResult {
     uint64 result = 1;
     MatchDetails match = 2;
-    string vote = 3;
+    int32 vote = 3;
 }
 
 message MatchDetails {
-    uint64 duration = 1;
-    uint64 startTime = 2;
-    repeated MatchPlayers players = 3;
-    string match_id = 4;
-    repeated uint64 tower_status = 5;
-    repeated uint64 barracks_status = 6;
-    uint64 cluster = 7;
-    uint64 first_blood_time = 8;
-    uint64 replay_salt = 9;
-    uint64 lobby_type = 10;
-    uint64 human_players = 11;
-    uint64 leagueid = 12;
-    uint64 positive_votes = 13;
-    uint64 negative_votes = 14;
-    uint64 game_mode = 15;
-    repeated MatchPickBans picks_bans = 16;
-    string replay_state = 17;
-    uint64 series_id  = 18;
-    uint64 series_type  = 19;
-    uint64 engine  = 20;
-    uint64 match_flags  = 21;
-    uint64 radiant_team_score  = 22;
-    uint64 dire_team_score  = 23;
-    string match_outcome  = 24;
-    uint64 pre_game_duration  = 25;
+    repeated MatchPlayers players = 1;
+	uint32 duration = 3;
+	fixed32 startTime = 4;
+	uint64 match_id = 6;
+	repeated uint32 tower_status = 8;
+	repeated uint32 barracks_status = 9;
+	uint32 cluster = 10;
+	uint32 first_blood_time = 12;
+	fixed32 replay_salt = 13;
+	fixed32 server_ip = 14;
+	uint32 server_port = 15;
+	uint32 lobby_type = 16;
+	uint32 human_players = 17;
+	uint32 average_skill = 18;
+	float game_balance = 19;
+	uint32 radiant_team_id = 20;
+	uint32 dire_team_id = 21;
+	uint32 leagueid = 22;
+	string radiant_team_name = 23;
+	string dire_team_name = 24;
+	uint64 radiant_team_logo = 25;
+	uint64 dire_team_logo = 26;
+	uint32 radiant_team_complete = 27;
+	uint32 dire_team_complete = 28;
+	uint32 positive_votes = 29;
+	uint32 negative_votes = 30;
+	uint64 game_mode = 31;
+	repeated MatchHeroSelectEvent picks_bans = 32;
+	uint64 match_seq_num = 33;
+	uint32 replay_state = 34;
+	uint32 radiant_guild_id = 35;
+	uint32 dire_guild_id = 36;
+	string radiant_team_tag = 37;
+	string dire_team_tag = 38;
+	uint32 series_id = 39;
+	uint32 series_type = 40;
+	repeated MatchBroadcasterChannel broadcaster_channels = 43;
+	uint32 engine = 44;
+	MatchCustomGameData custom_game_data = 45;
+	uint32 match_flags = 46;
+	fixed32 private_metadata_key = 47;
+	uint32 radiant_team_score = 48;
+	uint32 dire_team_score = 49;
+	uint32 match_outcome = 50;
+	uint32 tournament_id = 51;
+	uint32 tournament_round = 52;
+	uint32 pre_game_duration = 53;
+}
+
+message MatchHeroSelectEvent {
+	bool is_pick = 1;
+	uint32 team = 2;
+	uint32 hero_id = 3;
+}
+
+message MatchBroadcasterChannel {
+    string country_code = 1;
+    string description = 2;
+    repeated MatchBroadcasterInfo broadcaster_infos = 3;
+    string language_code = 4;
+}
+
+message MatchCustomGameData {
+    uint64 custom_game_id = 1;
+    string map_name = 2;
+}
+
+message MatchBroadcasterInfo {
+    uint32 account_id = 1;
+    string name = 2;
 }
 
 message MatchPlayers {
-    uint64 account_id = 1;
-    uint64 player_slot = 2;
-    uint64 hero_id = 3;
-    uint64 item_0 = 4;
-    uint64 item_1 = 5;
-    uint64 item_2 = 6;
-    uint64 item_3 = 7;
-    uint64 item_4 = 8;
-    uint64 item_5 = 9;
-    uint64 kills = 10;
-    uint64 deaths = 11;
-    uint64 assits = 12;
-    uint64 leaver_status = 13;
-    uint64 gold = 14;
-    uint64 last_hits = 15;
-    uint64 denies = 16;
-    uint64 gold_per_min = 17;
-    uint64 XP_per_min = 18;
-    uint64 gold_spent = 19;
-    uint64 hero_damage = 20;
-    uint64 tower_damage = 21;
-    uint64 hero_healing = 22;
-    uint64 level = 23;
-    string player_name = 24;
-    string party_id = 25;
-    bool active_battle_pass = 26;
-    uint64 net_worth = 27;
-    uint64 scaled_hero_damage = 28;
-    uint64 scaled_tower_damage = 29;
-    uint64 scaled_hero_healing = 30;
-    uint64 item_6 = 31;
-    uint64 item_7 = 32;
-    uint64 item_8 = 33;
+    uint32 account_id = 1;
+    uint32 player_slot = 2;
+    uint32 hero_id = 3;
+    uint32 item_0 = 4;
+    uint32 item_1 = 5;
+    uint32 item_2 = 6;
+    uint32 item_3 = 7;
+    uint32 item_4 = 8;
+    uint32 item_5 = 9;
+    uint32 item_6 = 59;
+    uint32 item_7 = 60;
+    uint32 item_8 = 61;
+    float expected_team_contribution = 10;
+    float scaled_metric = 11;
+    uint32 previous_rank = 12;
+    sint32 rank_change = 13;
+    bool solo_rank = 49;
+    bool seasonal_rank = 53;
+    bool rank_tier_updated = 66;
+    uint32 kills = 14;
+    uint32 deaths = 15;
+    uint32 assists = 16;
+    uint32 leaver_status = 17;
+    uint32 gold = 18;
+    uint32 last_hits = 19;
+    uint32 denies = 20;
+    uint32 gold_per_min = 21;
+    uint32 XP_per_min = 22;
+    uint32 gold_spent = 23;
+    uint32 hero_damage = 24;
+    uint32 tower_damage = 25;
+    uint32 hero_healing = 26;
+    uint32 level = 27;
+    uint32 time_last_seen = 28;
+    string player_name = 29;
+    uint32 support_ability_value = 30;
+    bool feeding_detected = 32;
+    uint32 search_rank = 34;
+    uint32 search_rank_uncertainty = 35;
+    int32 rank_uncertainty_change = 36;
+    uint32 hero_play_count = 37;
+    fixed64 party_id = 38;
+    uint32 scaled_hero_damage = 54;
+    uint32 scaled_tower_damage = 55;
+    uint32 scaled_hero_healing = 56;
+    float scaled_kills = 39;
+    float scaled_deaths = 40;
+    float scaled_assists = 41;
+    uint32 claimed_farm_gold = 42;
+    uint32 support_gold = 43;
+    uint32 claimed_denies = 44;
+    uint32 claimed_misses = 45;
+    uint32 misses = 46;
+    repeated MatchAbilityUpgrade ability_upgrades = 47;
+    repeated MatchAdditionalUnitInventory additional_units_inventory = 48;
+    repeated MatchPermanentBuffs permanent_buffs = 57;
+    MatchCustomGameData custom_game_data = 50;
+    bool active_plus_subscription = 51;
+    uint32 net_worth = 52;
+    uint32 bot_difficulty = 58;
+    uint32 hero_pick_order = 63;
+    bool hero_was_randomed = 64;
+    bool hero_was_bonus = 65;
+    bool active_battle_pass = 67;
+}
+
+message MatchPermanentBuffs {
+    uint64 permanent_buff = 1;
+    uint64 stack_count = 2;
+}
+
+message MatchAdditionalUnitInventory {
+	string unit_name = 1;
+	repeated uint32 items = 2;
+}
+
+message MatchAbilityUpgrade {
+    uint64 ability = 1;
+    uint64 time = 2;
+    uint64 level = 3;
 }
 
 message MatchPickBans {

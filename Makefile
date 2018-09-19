@@ -17,7 +17,6 @@ BOT_VER = v0.0.1
 API_NAME = dora_api
 API_VER = v0.0.1
 
-MINIKUBE_EVAL = $(shell minikube docker-env)
 MINIKUBE_STOPPED = $(shell minikube status | grep -o Stopped)
 
 
@@ -30,6 +29,26 @@ endif
 ifeq ($(SERVICE),api)
 	name=$(API_NAME)
 endif
+
+service:
+ifndef name
+	@echo 'Please provide SERVICE=name (posible variants: parser, bot, api)'
+	@exit 1
+endif
+ifeq ($(MINIKUBE_STOPPED), Stopped)
+	@echo minikube is down. Running minikube ...
+	@minikube start
+endif
+
+kube:
+ifeq ($(MINIKUBE_STOPPED), Stopped)
+	@echo minikube is down. Running minikube ...
+	@minikube start
+endif
+
+generate:
+	@protoc -I . ./pb/bot.proto --go_out=plugins=grpc:.
+	@protoc -I . ./pb/prs.proto --go_out=plugins=grpc:.
 
 .PHONY: target
 
@@ -48,54 +67,24 @@ endif
 
 .PHONY: dev
 
-dev:
-ifndef name
-	@echo 'Please provide SERVICE=name (posible variants: parser, bot, api)'
-	@exit 1
-endif
-ifeq ($(MINIKUBE_STOPPED), Stopped)
-	@echo minikube is down. Running minikube ...
-	@minikube start
-endif
-	@eval $(MINIKUBE_EVAL); \
+dev: service
+	@eval $(shell minikube docker-env); \
 	docker rmi -f dev-dora-$(name):latest || true; \
 	services/$(SERVICE)/dev.sh
+	@kubectl delete pod $(shell kubectl get pods | grep -o "^$(SERVICE)-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*") || true
+	@exit 0
+
+refresh: service
 	@kubectl delete pod $(shell kubectl get pods | grep -o "^$(SERVICE)-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*")
 	@exit 0
 
-refresh:
-ifndef name
-	@echo 'Please provide SERVICE=name (posible variants: parser, bot, api)'
-	@exit 1
-endif
-ifeq ($(MINIKUBE_STOPPED), Stopped)
-	@echo minikube is down. Running minikube ...
-	@minikube start
-endif
-	@eval $(MINIKUBE_EVAL)
-	@kubectl delete pod $(shell kubectl get pods | grep -o "^$(SERVICE)-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*")
-	@exit 0
-
-k8s-show-url:
-ifeq ($(MINIKUBE_STOPPED), Stopped)
-	@echo minikube is down. Running minikube ...
-	@minikube start
-endif
+k8s-show-url: kube
 	@minikube service dora-api --url
 
-k8s-clear-dev:
-ifeq ($(MINIKUBE_STOPPED), Stopped)
-	@echo minikube is down. Running minikube ...
-	@minikube start
-endif
+k8s-clear-dev: kube
 	@kubectl delete -f k8s/dora-dev.yaml
 
-k8s-create-dev:
-ifeq ($(MINIKUBE_STOPPED), Stopped)
-	@echo minikube is down. Running minikube ...
-	@minikube start
-endif
-	@eval $(MINIKUBE_EVAL)
+k8s-create-dev: kube
 	@kubectl create -f k8s/dora-dev.yaml
 	
 k8s-show-pods:

@@ -10,25 +10,6 @@ const loginDetails = {
 
 const bot = new DotaBot(loginDetails, true, false)
 let connected = false
-const _requestQueue = new Map()
-
-// Watch common events
-bot.Dota2.on('profileCardData', function (accId, data) {
-    const resolve = _requestQueue.get(`profileCardData_${accId}`)
-    if (!resolve) {
-        throw new Error(`unexpected event with ID 'profileCardData_${accId}'`)
-    }
-    resolve(accId, data)
-    _requestQueue.delete(`profileCardData_${accId}`)
-})
-bot.Dota2.on('matchDetailsData', function(matchID, matchDetailsData) {
-    const resolve = _requestQueue.get(`matchDetailsData_${matchID}`)
-    if (!resolve) {
-        throw new Error(`unexpected event with ID 'matchDetailsData_${matchID}'`)
-    }
-    resolve(matchID, matchDetailsData)
-    _requestQueue.delete(`matchDetailsData_${matchID}`)
-})
 
 // TODO: request timeouts
 module.exports = {
@@ -44,8 +25,13 @@ module.exports = {
     },
     async getProfileData(profileID) {
         return new Promise((resolve, reject) => {
-            _requestQueue.set(`profileCardData_${profileID}`, resolve)
-            bot.schedule(() => bot.Dota2.requestProfileCard(+profileID))
+            bot.schedule(() => bot.Dota2.requestProfileCard(+profileID, (err, card) => {
+                if (err) {
+                    reject(err)
+                    return
+                }
+                resolve(card)
+            }))
         })
     },
     async getPlayerMatchHistory(profileID, options) {
@@ -55,7 +41,6 @@ module.exports = {
             }
             bot.schedule(() => {
                 bot.Dota2.requestPlayerMatchHistory(+profileID, {...defaultOptions, ...options}, (err, matchHistoryResponse) => {
-                    console.log(JSON.stringify(matchHistoryResponse, null, '  '))
                     if (err) {
                         reject(err)
                         return
@@ -67,9 +52,14 @@ module.exports = {
     },
     async getMatchDetails(matchId) {
         return new Promise((resolve, reject) => {
-            _requestQueue.set(`matchDetailsData_${matchID}`, resolve)
             bot.schedule(() => {
-                bot.Dota2.requestMatchDetails(+matchId)
+                bot.Dota2.requestMatchDetails(+matchId, (err, matchDetailsData) => {
+                    if (err) {
+                        reject(err)
+                        return
+                    }
+                    resolve(matchDetailsData)
+                })
             })
         })
     }
