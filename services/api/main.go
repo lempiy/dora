@@ -16,7 +16,8 @@ func main() {
 	r := e.Router()
 
 	botService := clients.NewBotClient()
-	handlers.Run(r, botService)
+	parseService := clients.NewParserClient()
+	handlers.Run(r, botService, parseService)
 
 	e.Logger.Fatal(e.Start(":" + port))
 }

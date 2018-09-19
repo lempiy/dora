@@ -1,7 +1,7 @@
 package clients
 
 import (
-	"github.com/lempiy/dora/shared/pb/bot"
+	"github.com/lempiy/dora/shared/pb/prs"
 	"github.com/lempiy/dora/shared/help"
 	"google.golang.org/grpc/credentials"
 	"log"
@@ -13,16 +13,16 @@ import (
 	"io/ioutil"
 )
 
-type BotClient struct {
+type ParserClient struct {
 	domain string
 	port int
-	bot.BotServiceClient
+	prs.ParseServiceClient
 	conn *grpc.ClientConn
 }
 
-func NewBotClient()*BotClient {
-	domain := "dora-bot"
-	port := 6000
+func NewParserClient()*ParserClient {
+	domain := "dora-parser"
+	port := 7000
 	var opts []grpc.DialOption
 	ctx := context.Background()
 	dir := help.GetCurrentDir()
@@ -58,19 +58,19 @@ func NewBotClient()*BotClient {
 
 	conn, err := help.BlockingDial(ctx, "tcp", fmt.Sprintf("%s:%d", domain, port), creds, opts...)
 	if err != nil {
-		log.Printf("NewBotClient.BlockingDial %s", err)
+		log.Printf("NewParserClient.BlockingDial %s", err)
 		return nil
 	}
 
-	return &BotClient{
+	return &ParserClient{
 		domain:domain,
 		port: port,
 		conn: conn,
-		BotServiceClient: bot.NewBotServiceClient(conn),
+		ParseServiceClient: prs.NewParseServiceClient(conn),
 	}
 }
 
-func (b *BotClient) Close() {
+func (b *ParserClient) Close() {
 	b.conn.Close()
 }
 
