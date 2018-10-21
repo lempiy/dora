@@ -2,5 +2,5 @@
 services/parser/.temp
 services/**/vendor
 build
-services/bot/config/*
+services/bot/config*
 services/bot/node_modules

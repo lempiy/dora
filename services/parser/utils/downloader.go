@@ -19,7 +19,7 @@ func DownloadFile(path string, endpoint string) error {
 	defer out.Close()
 
 	c := http.DefaultClient
-	c.Timeout = time.Second * 4
+	c.Timeout = time.Second * 60
 	// Make request
 	to, err := url.Parse(endpoint)
 	if err != nil {

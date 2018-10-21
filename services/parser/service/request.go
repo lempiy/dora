@@ -19,7 +19,7 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 	path := fmt.Sprintf("%s/%d_%d.dem.bz2", tempLocation, req.MatchId, req.ReplaySalt)
 	err := utils.DownloadFile(path, req.ReplayUrl)
 	if err != nil {
-		log.Printf("ParserService.Parse: %s", err)
+		log.Printf("ParserService.Parse: Error upon DownloadFile: %s", err)
 		return &prs.ParseResult{
 			ReplayData: nil,
 			Success:    false,
@@ -30,16 +30,16 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 	defer clearTempFolder()
 	defer f.Close()
 	if err != nil {
-		log.Printf("ParserService.Parse: %s", err)
+		log.Printf("ParserService.Parse: Error upon os.Open: %s", err)
 		return &prs.ParseResult{
 			ReplayData: nil,
 			Success:    false,
 			ErrorInfo:  "Error upon opening replay",
 		}, nil
 	}
-	err = utils.UncompressBZ2(f, tempLocation)
+	err = utils.UncompressBZ2(f, fmt.Sprintf("%s/%d_%d.dem", tempLocation, req.MatchId, req.ReplaySalt))
 	if err != nil {
-		log.Printf("ParserService.Parse: %s", err)
+		log.Printf("ParserService.Parse: Error upon UncompressBZ2: %s", err)
 		return &prs.ParseResult{
 			ReplayData: nil,
 			Success:    false,
@@ -48,7 +48,7 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 	}
 	replayFile, err := os.Open(fmt.Sprintf("%s/%d_%d.dem", tempLocation, req.MatchId, req.ReplaySalt))
 	if err != nil {
-		log.Printf("ParserService.Parse: %s", err)
+		log.Printf("ParserService.Parse: Error upon os.Open: %s", err)
 		return &prs.ParseResult{
 			ReplayData: nil,
 			Success:    false,
@@ -58,7 +58,7 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 	defer replayFile.Close()
 	data, err := exec.ParseReplay(replayFile)
 	if err != nil {
-		log.Printf("ParserService.Parse: %s", err)
+		log.Printf("ParserService.Parse: Error upon exec.ParseReplay: %s", err)
 		return &prs.ParseResult{
 			ReplayData: nil,
 			Success:    false,

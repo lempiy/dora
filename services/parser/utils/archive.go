@@ -3,8 +3,7 @@ package utils
 import (
 	"bytes"
 	"compress/bzip2"
-	"errors"
-	filetype "gopkg.in/h2non/filetype.v1"
+	"gopkg.in/h2non/filetype.v1"
 	"gopkg.in/h2non/filetype.v1/types"
 	"io"
 	"os"
@@ -14,15 +13,7 @@ import (
 // UncompressBZ2 - uncompresses *.bz2 files to provided location
 func UncompressBZ2(source io.Reader, location string) error {
 	body := bzip2.NewReader(source)
-	body, kind, err := match(body)
-	if kind.Extension != "bz2" {
-		return errors.New("wrong file extension")
-	}
-	if err != nil {
-		return err
-	}
-
-	err = copy(location, 0666, body)
+	err := copy(location, 0666, body)
 	if err != nil {
 		return err
 	}
