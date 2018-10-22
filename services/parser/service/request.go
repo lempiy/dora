@@ -8,14 +8,14 @@ import (
 	"golang.org/x/net/context"
 	"log"
 	"os"
-	"path/filepath"
 )
 
-const tempLocation = "./.temp"
 
 type ParserService struct{}
 
 func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.ParseResult, error) {
+	tempLocation := createTempFolder(req.MatchId)
+	defer clearTempFolder(tempLocation)
 	path := fmt.Sprintf("%s/%d_%d.dem.bz2", tempLocation, req.MatchId, req.ReplaySalt)
 	err := utils.DownloadFile(path, req.ReplayUrl)
 	if err != nil {
@@ -27,7 +27,6 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 		}, nil
 	}
 	f, err := os.Open(path)
-	defer clearTempFolder()
 	defer f.Close()
 	if err != nil {
 		log.Printf("ParserService.Parse: Error upon os.Open: %s", err)
@@ -71,23 +70,19 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 	}, nil
 }
 
-func clearTempFolder() {
-	d, err := os.Open(tempLocation)
+func createTempFolder(matchId uint64) string {
+	folder := fmt.Sprintf("./match_%d", matchId)
+	err := os.MkdirAll(folder, os.ModePerm)
 	if err != nil {
-		log.Printf("clearTempFolder: %s", err)
-		return
+		log.Printf("createTempFolder. Err: `%s`", err)
 	}
-	defer d.Close()
-	names, err := d.Readdirnames(-1)
+	return folder
+}
+
+
+func clearTempFolder(folder string) {
+	err := os.RemoveAll(folder)
 	if err != nil {
-		log.Printf("clearTempFolder: %s", err)
-		return
+		log.Printf("clearTempFolder. Err: `%s`", err)
 	}
-	for _, name := range names {
-		err = os.RemoveAll(filepath.Join(tempLocation, name))
-		if err != nil {
-			log.Printf("clearTempFolder: %s", err)
-		}
-	}
-	return
 }
