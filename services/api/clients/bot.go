@@ -1,16 +1,16 @@
 package clients
 
 import (
-	"github.com/lempiy/dora/shared/pb/bot"
-	"github.com/lempiy/dora/shared/help"
-	"google.golang.org/grpc/credentials"
-	"log"
-	"google.golang.org/grpc"
-	"fmt"
-	"golang.org/x/net/context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
+	"github.com/lempiy/dora/shared/help"
+	"github.com/lempiy/dora/shared/pb/bot"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"io/ioutil"
+	"log"
 )
 
 type BotClient struct {
@@ -56,9 +56,9 @@ func NewBotClient()*BotClient {
 		log.Fatal("Cannot read credentials from file: ", err)
 	}
 
-	conn, err := help.BlockingDial(ctx, "tcp", fmt.Sprintf("%s:%d", domain, port), creds, opts...)
+	conn, err := help.Connect(ctx, fmt.Sprintf("%s:%d", domain, port), creds, opts...)
 	if err != nil {
-		log.Printf("NewBotClient.BlockingDial %s", err)
+		log.Printf("NewBotClient. Cannot connect to server: `%s`", err)
 		return nil
 	}
 

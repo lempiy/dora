@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/lempiy/dora/services/parser/exec"
+	"github.com/lempiy/dora/services/parser/processor"
 	"github.com/lempiy/dora/services/parser/utils"
 	"github.com/lempiy/dora/shared/pb/prs"
 	"golang.org/x/net/context"
@@ -55,7 +56,10 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 		}, nil
 	}
 	defer replayFile.Close()
-	data, err := exec.ParseReplay(replayFile)
+	parser := exec.NewParser()
+	position := processor.NewPositionProcessor()
+	parser.RegisterProcessors(position)
+	err = parser.Parse(replayFile)
 	if err != nil {
 		log.Printf("ParserService.Parse: Error upon exec.ParseReplay: %s", err)
 		return &prs.ParseResult{
@@ -65,7 +69,10 @@ func (s *ParserService) Parse(ctx context.Context, req *prs.ParseRequest) (*prs.
 		}, nil
 	}
 	return &prs.ParseResult{
-		ReplayData: data,
+		ReplayData: &prs.ReplayData{
+			GameTotalTimeSec: parser.GetGameTimeDuration(),
+			MovesMap: position.Result(),
+		},
 		Success:    true,
 	}, nil
 }

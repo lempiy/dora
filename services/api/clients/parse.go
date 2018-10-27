@@ -56,9 +56,9 @@ func NewParserClient()*ParserClient {
 		log.Fatal("Cannot read credentials from file: ", err)
 	}
 
-	conn, err := help.BlockingDial(ctx, "tcp", fmt.Sprintf("%s:%d", domain, port), creds, opts...)
+	conn, err := help.Connect(ctx, fmt.Sprintf("%s:%d", domain, port), creds, opts...)
 	if err != nil {
-		log.Printf("NewParserClient.BlockingDial %s", err)
+		log.Printf("NewParserClient. Cannot connect to server: `%s`", err)
 		return nil
 	}
 

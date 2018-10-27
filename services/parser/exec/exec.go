@@ -2,75 +2,73 @@ package exec
 
 import (
 	"github.com/dotabuff/manta"
-	"github.com/lempiy/dora/shared/pb/prs"
 	"io"
-	"strings"
 	"time"
 )
 
+type Processor interface {
+	Process(startGameTime, gameTime time.Duration, entity *manta.Entity, op manta.EntityOp) error
+	Finish(gameEndTime time.Duration) error
+}
+
+type Parser struct {
+	gameTime time.Duration
+	preGameTime time.Duration
+	gameEndTime time.Duration
+	startGameTime time.Duration
+	processors []Processor
+
+	gameTotalTimeSec uint64
+}
+
+func NewParser() *Parser {
+	return &Parser{}
+}
+
+func (parser *Parser) RegisterProcessors(processors ...Processor) {
+	parser.processors = append(parser.processors, processors...)
+}
+
 // ParseReplay - parses replay from source stream, returns parsed data
-func ParseReplay(source io.Reader) (*prs.ReplayData, error) {
-	var result prs.ReplayData
+func (parser *Parser) Parse(source io.Reader) error {
 	p, err := manta.NewStreamParser(source)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	var (
-		gameTime      = time.Duration(0)
-		preGameTime   = time.Duration(0)
-		startGameTime = time.Duration(0)
-		gameEndTime   = time.Duration(0)
-		movement      = make(map[string]*[]*prs.Move)
-		checks        = make(map[string]time.Duration)
-	)
 	p.OnEntity(func(entity *manta.Entity, op manta.EntityOp) error {
 		if entity.GetClassName() == "CDOTAGamerulesProxy" {
 			if v, ok := entity.GetFloat32("m_pGameRules.m_fGameTime"); ok {
-				gameTime = time.Duration(v)
+				parser.gameTime = time.Duration(v)
 			}
 			if v, ok := entity.GetFloat32("m_pGameRules.m_flPreGameStartTime"); ok {
-				preGameTime = time.Duration(v)
+				parser.preGameTime = time.Duration(v)
 			}
 			if v, ok := entity.GetFloat32("m_pGameRules.m_flGameStartTime"); ok {
-				startGameTime = time.Duration(v)
+				parser.startGameTime = time.Duration(v)
 			}
 			if v, ok := entity.GetFloat32("m_pGameRules.m_flGameEndTime"); ok {
-				gameEndTime = time.Duration(v)
+				parser.gameEndTime = time.Duration(v)
 			}
 		}
-		if strings.HasPrefix(entity.GetClassName(), "CDOTA_Unit_Hero") {
-			if startGameTime != 0 && checks[entity.GetClassName()] != gameTime {
-				checks[entity.GetClassName()] = gameTime
-				x, _ := entity.GetUint64("CBodyComponent.m_cellX")
-				y, _ := entity.GetUint64("CBodyComponent.m_cellY")
-				if arr, exist := movement[entity.GetClassName()]; !exist {
-					data := &[]*prs.Move{
-						{
-							Time: uint64(gameTime - startGameTime),
-							X:    x,
-							Y:    y,
-						},
-					}
-					movement[entity.GetClassName()] = data
-				} else {
-					*arr = append(*arr, &prs.Move{
-						Time: uint64(gameTime - startGameTime),
-						X:    x,
-						Y:    y,
-					})
-				}
+		for _, proc := range parser.processors {
+			err = proc.Process(parser.startGameTime, parser.gameTime, entity, op)
+			if err != nil {
+				return err
 			}
-
 		}
 		return nil
 	})
-	result.GameTotalTimeSec = uint64(gameEndTime - startGameTime)
+	parser.gameTotalTimeSec = uint64(parser.gameEndTime - parser.startGameTime)
 	p.Start()
-	for key, value := range movement {
-		result.MovesMap = append(result.MovesMap, &prs.MovesMap{
-			HeroName: key,
-			Moves:    *value,
-		})
+	for _, proc := range parser.processors {
+		err = proc.Finish(parser.gameEndTime)
+		if err != nil {
+			return err
+		}
 	}
-	return &result, nil
+	return nil
+}
+
+func (parser *Parser) GetGameTimeDuration() uint64 {
+	return parser.gameTotalTimeSec
 }

@@ -1,9 +1,11 @@
 package help
 
 import (
+	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc"
+	"log"
 	"net"
 	"time"
 )
@@ -73,5 +75,30 @@ func BlockingDial(ctx context.Context, network, address string, creds credential
 		return nil, res.(error)
 	case <-ctx.Done():
 		return nil, ctx.Err()
+	}
+}
+
+func Connect(ctx context.Context, url string, creds credentials.TransportCredentials, opts ...grpc.DialOption) (conn *grpc.ClientConn, err error) {
+	conn, err = BlockingDial(ctx, "tcp", url, creds, opts...)
+	if err == nil {
+		return
+	}
+	log.Printf("GRPC client -> connect: `%s`", err)
+	ticker := time.NewTicker(time.Second * 2)
+	defer func() {
+		ticker.Stop()
+	}()
+	for {
+		select {
+		case <-ctx.Done():
+			err = fmt.Errorf("GRPC Connection cancelled via context")
+			return
+		case <-ticker.C:
+			conn, err = BlockingDial(ctx, "tcp", url, creds, opts...)
+			if err == nil {
+				return
+			}
+			log.Printf("GRPC client -> connect: `%s`", err)
+		}
 	}
 }
