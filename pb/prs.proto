@@ -33,4 +33,6 @@ message Move {
     uint64 time = 1;
     uint64 x = 2;
     uint64 y = 3;
+    uint64 fullX = 4;
+    uint64 fullY = 5;
 }

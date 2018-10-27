@@ -7,7 +7,11 @@ import (
 	"time"
 )
 
-const DefaultNetOffset = 50
+const (
+	DefaultNetOffset = 50
+	cellSize = 1 << 7
+	coordFullSize = 16384
+)
 
 type PositionProcessor struct{
 	movement map[string]*[]*prs.Move
@@ -28,12 +32,15 @@ func (p *PositionProcessor) Process(startGameTime, gameTime time.Duration, entit
 			p.checks[entity.GetClassName()] = gameTime
 			x, _ := entity.GetUint64("CBodyComponent.m_cellX")
 			y, _ := entity.GetUint64("CBodyComponent.m_cellY")
+			fullX, fullY := mapCellToCoords(entity)
 			if arr, exist := p.movement[entity.GetClassName()]; !exist {
 				data := &[]*prs.Move{
 					{
 						Time: uint64(gameTime - startGameTime),
 						X:    x - DefaultNetOffset,
 						Y:    y - DefaultNetOffset,
+						FullX: fullX,
+						FullY: fullY,
 					},
 				}
 				p.movement[entity.GetClassName()] = data
@@ -42,11 +49,23 @@ func (p *PositionProcessor) Process(startGameTime, gameTime time.Duration, entit
 					Time: uint64(gameTime - startGameTime),
 					X:    x - DefaultNetOffset,
 					Y:    y - DefaultNetOffset,
+					FullX: fullX,
+					FullY: fullY,
 				})
 			}
 		}
 	}
 	return nil
+}
+
+func mapCellToCoords(entity *manta.Entity) (rx uint64, ry uint64) {
+	x, _ := entity.GetUint64("CBodyComponent.m_cellX")
+	y, _ := entity.GetUint64("CBodyComponent.m_cellY")
+	vx, _ := entity.GetFloat32("CBodyComponent.m_vecX")
+	vy, _ := entity.GetFloat32("CBodyComponent.m_vecY")
+	rx = (x - 50) * cellSize + uint64(vx)
+	ry = (y - 50) * cellSize + uint64(vy)
+	return
 }
 
 func (p *PositionProcessor) Finish(gameEndTime time.Duration) error {

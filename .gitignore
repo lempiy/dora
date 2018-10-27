@@ -4,3 +4,4 @@ services/**/vendor
 build
 services/bot/config*
 services/bot/node_modules
+entity.structure.*
