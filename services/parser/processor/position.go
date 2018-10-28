@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	DefaultNetOffset = 50
+	DefaultNetXOffset = 68
+	DefaultNetYOffset = 60
 	cellSize = 1 << 7
-	coordFullSize = 16384
+	coordFullSize = 1 << 14
 )
 
 type PositionProcessor struct{
@@ -37,8 +38,8 @@ func (p *PositionProcessor) Process(startGameTime, gameTime time.Duration, entit
 				data := &[]*prs.Move{
 					{
 						Time: uint64(gameTime - startGameTime),
-						X:    x - DefaultNetOffset,
-						Y:    y - DefaultNetOffset,
+						X:    x - DefaultNetXOffset,
+						Y:    y - DefaultNetYOffset,
 						FullX: fullX,
 						FullY: fullY,
 					},
@@ -47,8 +48,8 @@ func (p *PositionProcessor) Process(startGameTime, gameTime time.Duration, entit
 			} else {
 				*arr = append(*arr, &prs.Move{
 					Time: uint64(gameTime - startGameTime),
-					X:    x - DefaultNetOffset,
-					Y:    y - DefaultNetOffset,
+					X:    x - DefaultNetXOffset,
+					Y:    y - DefaultNetYOffset,
 					FullX: fullX,
 					FullY: fullY,
 				})
@@ -63,8 +64,8 @@ func mapCellToCoords(entity *manta.Entity) (rx uint64, ry uint64) {
 	y, _ := entity.GetUint64("CBodyComponent.m_cellY")
 	vx, _ := entity.GetFloat32("CBodyComponent.m_vecX")
 	vy, _ := entity.GetFloat32("CBodyComponent.m_vecY")
-	rx = (x - 50) * cellSize + uint64(vx)
-	ry = (y - 50) * cellSize + uint64(vy)
+	rx = (x - DefaultNetXOffset) * cellSize + uint64(vx)
+	ry = (y - DefaultNetYOffset) * cellSize + uint64(vy)
 	return
 }
 
