@@ -38,12 +38,13 @@ module.exports = {
     async getMatchesHistory(call, callback) {
         const playerID = call.request.player_id;
         if (!bot.isConnected) bot.connect()
-        let matches;
-        matches = await bot.getPlayerMatchHistory(playerID)
+        let matches = await bot.getPlayerMatchHistory(playerID, {})
         if (!matches) {
             callback('cannot user matches history')
         }
-        callback(null, {matches: deLong(matches)})
+        callback(null, {
+            matches: deLong(matches)
+        })
     },
     async getMatchDetails(call, callback) {
         const matchID = call.request.match_id

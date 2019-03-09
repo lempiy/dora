@@ -1,10 +1,7 @@
 package utils
 
 import (
-	"bytes"
 	"compress/bzip2"
-	"gopkg.in/h2non/filetype.v1"
-	"gopkg.in/h2non/filetype.v1/types"
 	"io"
 	"os"
 	"path/filepath"
@@ -18,21 +15,6 @@ func UncompressBZ2(source io.Reader, location string) error {
 		return err
 	}
 	return nil
-}
-
-func match(r io.Reader) (io.Reader, types.Type, error) {
-	buffer := make([]byte, 512)
-
-	n, err := r.Read(buffer)
-	if err != nil && err != io.EOF {
-		return nil, types.Unknown, err
-	}
-
-	r = io.MultiReader(bytes.NewBuffer(buffer[:n]), r)
-
-	typ, err := filetype.Match(buffer)
-
-	return r, typ, err
 }
 
 func copy(path string, mode os.FileMode, src io.Reader) error {

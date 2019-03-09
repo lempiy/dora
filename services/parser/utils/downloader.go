@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -31,6 +33,11 @@ func DownloadFile(path string, endpoint string) error {
 	}
 	resp, err := c.Do(&req)
 	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(resp.Body)
+		err = fmt.Errorf("DownloadFile. Returned non-OK status code - `%d`. Body: `%s`", resp.StatusCode, string(body))
 		return err
 	}
 	defer resp.Body.Close()

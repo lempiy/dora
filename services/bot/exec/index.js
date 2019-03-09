@@ -40,7 +40,10 @@ module.exports = {
                 matches_requested: 10
             }
             bot.schedule(() => {
-                bot.Dota2.requestPlayerMatchHistory(+profileID, {...defaultOptions, ...options}, (err, matchHistoryResponse) => {
+                bot.Dota2.requestPlayerMatchHistory(+profileID, {
+                    ...defaultOptions,
+                    ...options
+                }, (err, matchHistoryResponse) => {
                     if (err) {
                         reject(err)
                         return

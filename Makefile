@@ -78,6 +78,9 @@ refresh: service
 	@kubectl delete pod $(shell kubectl get pods | grep -o "^$(SERVICE)-[a-z0-9]*-[a-z0-9]*-[a-z0-9]*")
 	@exit 0
 
+logs:
+	@kubectl logs deployment/$(SERVICE)-deployment
+
 k8s-show-url: kube
 	@minikube service dora-api --url
 

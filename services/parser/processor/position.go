@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	DefaultNetXOffset = 68
-	DefaultNetYOffset = 60
+	DefaultNetXOffset = 64
+	DefaultNetYOffset = 63
 	cellSize = 1 << 7
 	coordFullSize = 1 << 14
 )
