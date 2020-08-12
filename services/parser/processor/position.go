@@ -10,20 +10,20 @@ import (
 const (
 	DefaultNetXOffset = 64
 	DefaultNetYOffset = 63
-	cellSize = 1 << 7
-	coordFullSize = 1 << 14
+	cellSize          = 1 << 7
+	coordFullSize     = 1 << 14
 )
 
-type PositionProcessor struct{
+type PositionProcessor struct {
 	movement map[string]*[]*prs.Move
-	checks map[string]time.Duration
-	result []*prs.MovesMap
+	checks   map[string]time.Duration
+	result   []*prs.MovesMap
 }
 
 func NewPositionProcessor() *PositionProcessor {
 	return &PositionProcessor{
 		movement: make(map[string]*[]*prs.Move),
-		checks: make(map[string]time.Duration),
+		checks:   make(map[string]time.Duration),
 	}
 }
 
@@ -37,9 +37,9 @@ func (p *PositionProcessor) Process(startGameTime, gameTime time.Duration, entit
 			if arr, exist := p.movement[entity.GetClassName()]; !exist {
 				data := &[]*prs.Move{
 					{
-						Time: uint64(gameTime - startGameTime),
-						X:    x - DefaultNetXOffset,
-						Y:    y - DefaultNetYOffset,
+						Time:  uint64(gameTime - startGameTime),
+						X:     x - DefaultNetXOffset,
+						Y:     y - DefaultNetYOffset,
 						FullX: fullX,
 						FullY: fullY,
 					},
@@ -47,9 +47,9 @@ func (p *PositionProcessor) Process(startGameTime, gameTime time.Duration, entit
 				p.movement[entity.GetClassName()] = data
 			} else {
 				*arr = append(*arr, &prs.Move{
-					Time: uint64(gameTime - startGameTime),
-					X:    x - DefaultNetXOffset,
-					Y:    y - DefaultNetYOffset,
+					Time:  uint64(gameTime - startGameTime),
+					X:     x - DefaultNetXOffset,
+					Y:     y - DefaultNetYOffset,
 					FullX: fullX,
 					FullY: fullY,
 				})
@@ -64,8 +64,8 @@ func mapCellToCoords(entity *manta.Entity) (rx uint64, ry uint64) {
 	y, _ := entity.GetUint64("CBodyComponent.m_cellY")
 	vx, _ := entity.GetFloat32("CBodyComponent.m_vecX")
 	vy, _ := entity.GetFloat32("CBodyComponent.m_vecY")
-	rx = (x - DefaultNetXOffset) * cellSize + uint64(vx)
-	ry = (y - DefaultNetYOffset) * cellSize + uint64(vy)
+	rx = (x-DefaultNetXOffset)*cellSize + uint64(vx)
+	ry = (y-DefaultNetYOffset)*cellSize + uint64(vy)
 	return
 }
 
