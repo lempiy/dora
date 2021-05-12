@@ -10,7 +10,7 @@
   "dependencies": {
     "deferred": "^0.7.9",
     "dota2-bot": "^1.1.2",
-    "grpc": "^1.14.1",
+    "grpc": "^1.24.9",
     "lodash": "^4.17.19",
     "long": "^4.0.0",
     "merge": "^2.1.1",
