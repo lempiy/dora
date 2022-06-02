@@ -15,7 +15,7 @@
     "long": "^4.0.0",
     "merge": "^2.1.1",
     "moment": "^2.22.1",
-    "protobufjs": "^6.8.6",
+    "protobufjs": "^6.11.3",
     "steam": "^1.4.0",
     "winston": "^2.4.2"
   },
